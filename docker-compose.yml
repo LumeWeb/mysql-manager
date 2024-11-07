@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mysql-manager:
+    build: .
+    container_name: mysql-manager
+    restart: unless-stopped
+    ports:
+      - "8080:8080"   # API port
+      - "9100:9100"   # Metrics port
+      - "3306:3306"   # MySQL port
+    environment:
+      # MySQL Configuration
+      - MYSQL_MODE=standalone
+      - MYSQL_ROLE=primary
+      - MYSQL_ROOT_PASSWORD=your_secure_password
+      - MYSQL_PORT=3306
+      
+      # Backup Configuration
+      - BACKUP_ENABLED=true
+      - BACKUP_FULL_SCHEDULE=0 0 * * *
+      - BACKUP_RETENTION_DAYS=7
+      - BACKUP_COMPRESSION_LEVEL=6
+      - BACKUP_CONTINUOUS=true
+      
+      # Storage Configuration
+      - STORAGE_ENDPOINT=https://s3.example.com
+      - STORAGE_BUCKET=mysql-backups
+      - STORAGE_ACCESS_KEY=your_access_key
+      - STORAGE_SECRET_KEY=your_secret_key
+      
+      # Monitoring Configuration
+      - METRICS_PORT=9100
+      - METRICS_USERNAME=admin
+      - METRICS_PASSWORD=secure_metrics_password
+      
+      # API Configuration
+      - API_PORT=8080
+      - API_USERNAME=admin
+      - API_PASSWORD=secure_api_password
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - backup-data:/backup
+
+volumes:
+  mysql-data:
+  backup-data:
